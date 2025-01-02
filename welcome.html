@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facetag - Welcome</title>
+    <style>
+        :root {
+            --dark-bg: #1e2127;
+            --light-blue: #45b3e7;
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .welcome-container {
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .welcome-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 3rem;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--light-blue);
+            transform: translateY(30px);
+            opacity: 0;
+            animation: slideUp 0.8s ease forwards;
+        }
+
+        @keyframes slideUp {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .welcome-title {
+            color: var(--white);
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .user-name {
+            color: var(--light-blue);
+            font-size: 3.5rem;
+            margin-bottom: 2rem;
+            display: block;
+        }
+
+        .status {
+            color: var(--white);
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+            animation-delay: 0.8s;
+        }
+
+        .time {
+            color: var(--light-blue);
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+            animation-delay: 1s;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        .menu-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 2rem;
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+            animation-delay: 1.2s;
+        }
+
+        .menu-btn {
+            padding: 1rem;
+            font-size: 1rem;
+            background: transparent;
+            border: 2px solid var(--light-blue);
+            color: var(--light-blue);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            width: 200px;
+            height: 200px;
+            background: var(--light-blue);
+            border-radius: 50%;
+            transition: transform 0.5s ease;
+            z-index: -1;
+        }
+
+        .menu-btn:hover {
+            color: var(--dark-bg);
+        }
+
+        .menu-btn:hover::before {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .digital-circle {
+            position: absolute;
+            border: 2px solid var(--light-blue);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .circle1 {
+            width: 300px;
+            height: 300px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.1;
+        }
+
+        .circle2 {
+            width: 400px;
+            height: 400px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.05;
+            animation-delay: 0.5s;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background circles -->
+    <div class="digital-circle circle1"></div>
+    <div class="digital-circle circle2"></div>
+
+    <div class="welcome-container">
+        <div class="welcome-card">
+            <h1 class="welcome-title">Welcome Back,</h1>
+            <span class="user-name" id="userName">Loading...</span>
+            <div class="status">Successfully authenticated</div>
+            <div class="time" id="currentTime">00:00:00</div>
+            <div class="menu-buttons">
+                <button class="menu-btn" onclick="handleMenuClick('profile')">View Profile</button>
+                <button class="menu-btn" onclick="handleMenuClick('settings')">Settings</button>
+                <button class="menu-btn" onclick="handleMenuClick('dashboard')">Dashboard</button>
+                <button class="menu-btn" onclick="handleMenuClick('logout')">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get user name from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const userName = urlParams.get('name') || 'Guest';
+        document.getElementById('userName').textContent = userName;
+
+        // Update time
+        function updateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString();
+            document.getElementById('currentTime').textContent = timeStr;
+        }
+        
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // Handle menu clicks
+        function handleMenuClick(action) {
+            const button = event.target;
+            button.style.transform = 'scale(0.95)';
+            
+            setTimeout(() => {
+                button.style.transform = 'scale(1)';
+                switch(action) {
+                    case 'logout':
+                        window.location.href = 'auth.html';
+                        break;
+                    default:
+                        alert(`${action.charAt(0).toUpperCase() + action.slice(1)} feature coming soon!`);
+                }
+            }, 200);
+        }
+    </script>
+</body>
+</html>

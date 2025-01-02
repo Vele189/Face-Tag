@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FaceTag - Explore</title>
+    <style>
+        :root {
+            --dark-bg: #1e2127;
+            --light-blue: #45b3e7;
+            --white: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --success-green: #4CAF50;
+            --warning-orange: #FF9800;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            min-height: 100vh;
+            color: var(--white);
+        }
+
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-right: 2px solid var(--light-blue);
+            backdrop-filter: blur(10px);
+        }
+
+        .user-profile {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .profile-image {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 3px solid var(--light-blue);
+            margin-bottom: 1rem;
+            object-fit: cover;
+        }
+
+        .user-name {
+            color: var(--light-blue);
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .user-email {
+            color: var(--white);
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 1rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            color: var(--white);
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: var(--light-blue);
+            color: var(--dark-bg);
+        }
+
+        .nav-link.active {
+            background: var(--light-blue);
+            color: var(--dark-bg);
+        }
+
+        .logout-btn {
+            margin-top: 2rem;
+            padding: 0.8rem;
+            background: transparent;
+            border: 2px solid #ff4444;
+            color: #ff4444;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .logout-btn:hover {
+            background: #ff4444;
+            color: var(--dark-bg);
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            padding: 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .welcome-text {
+            font-size: 2rem;
+        }
+
+        .date-time {
+            color: var(--light-blue);
+            font-size: 1.1rem;
+        }
+
+        /* Explore Grid */
+        .explore-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            padding: 1rem;
+        }
+
+        .explore-card {
+            background: var(--card-bg);
+            border: 1px solid var(--light-blue);
+            border-radius: 15px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .explore-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(69, 179, 231, 0.2);
+        }
+
+        .explore-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(69, 179, 231, 0.1), transparent);
+            transform: translateX(-100%);
+            transition: 0.5s;
+        }
+
+        .explore-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--light-blue);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            color: var(--light-blue);
+            margin-bottom: 1rem;
+        }
+
+        .card-description {
+            color: var(--white);
+            opacity: 0.8;
+            margin-bottom: 1rem;
+        }
+
+        .card-status {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+
+        .status-active {
+            background: rgba(76, 175, 80, 0.2);
+            color: var(--success-green);
+        }
+
+        .status-coming-soon {
+            background: rgba(255, 152, 0, 0.2);
+            color: var(--warning-orange);
+        }
+
+        /* Quick Stats */
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--light-blue);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            color: var(--light-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--white);
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="user-profile">
+                <img src="" alt="Profile" class="profile-image" id="userImage">
+                <h2 class="user-name" id="userName">Loading...</h2>
+                <p class="user-email" id="userEmail">loading@email.com</p>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active">
+                        🎯 Explore
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        👤 Profile
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        ⚙️ Settings
+                    </a>
+                </li>
+            </ul>
+            <button class="logout-btn" onclick="handleLogout()">Logout</button>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1 class="welcome-text">Welcome, <span id="welcomeName">User</span>!</h1>
+                <div class="date-time" id="dateTime">Loading...</div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="quick-stats">
+                <div class="stat-card">
+                    <div class="stat-value">0</div>
+                    <div class="stat-label">Reward Points</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">0</div>
+                    <div class="stat-label">Purchases</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">$0</div>
+                    <div class="stat-label">Total Savings</div>
+                </div>
+            </div>
+
+            <!-- Explore Grid -->
+            <div class="explore-grid">
+                <!-- Loyalty and Rewards -->
+                <div class="explore-card" onclick="navigateToFeature('loyalty')">
+                    <div class="card-icon">🎁</div>
+                    <h3 class="card-title">Loyalty & Rewards</h3>
+                    <p class="card-description">Earn points and redeem rewards at your favorite stores using just your face!</p>
+                    <span class="card-status status-active">Active</span>
+                </div>
+
+                <!-- In App Purchases -->
+                <div class="explore-card" onclick="navigateToFeature('purchases')">
+                    <div class="card-icon">🛍️</div>
+                    <h3 class="card-title">In-App Purchases</h3>
+                    <p class="card-description">Browse and buy products from partnered stores with seamless checkout.</p>
+                    <span class="card-status status-coming-soon">Coming Soon</span>
+                </div>
+
+                <!-- Access -->
+                <div class="explore-card" onclick="navigateToFeature('access')">
+                    <div class="card-icon">🔑</div>
+                    <h3 class="card-title">Access</h3>
+                    <p class="card-description">Use your face as a digital key for supported venues and events.</p>
+                    <span class="card-status status-active">Active</span>
+                </div>
+
+                <!-- FacePay -->
+                <div class="explore-card" onclick="navigateToFeature('facepay')">
+                    <div class="card-icon">💳</div>
+                    <h3 class="card-title">FacePay</h3>
+                    <p class="card-description">Make secure payments using facial recognition technology.</p>
+                    <span class="card-status status-coming-soon">Coming Soon</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get user data from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const userName = urlParams.get('name') || 'User';
+        const userEmail = urlParams.get('email') || 'user@example.com';
+        const userImage = urlParams.get('image_path') || '/api/placeholder/120/120';
+
+        // Update user information in the UI
+        document.getElementById('userName').textContent = userName;
+        document.getElementById('welcomeName').textContent = userName;
+        document.getElementById('userEmail').textContent = userEmail;
+        document.getElementById('userImage').src = userImage;
+
+        // Update date and time
+        function updateDateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            document.getElementById('dateTime').textContent = now.toLocaleDateString('en-US', options);
+        }
+        
+        setInterval(updateDateTime, 1000);
+        updateDateTime();
+
+        // Handle logout
+        function handleLogout() {
+            const confirmed = confirm('Are you sure you want to logout?');
+            if (confirmed) {
+                window.location.href = 'auth.html';
+            }
+        }
+
+        // Handle navigation
+        function navigateToFeature(feature) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const userId = urlParams.get('user_id');
+    
+    if (!userId) {
+        alert('Session error: User ID not found. Please login again.');
+        window.location.href = 'auth.html';
+        return;
+    }
+
+    if (feature === 'loyalty') {
+        window.location.href = `loyalty.html?user_id=${userId}&name=${urlParams.get('name')}&email=${urlParams.get('email')}&age=${urlParams.get('age')}&phone=${urlParams.get('phone')}&image_path=${urlParams.get('image_path')}`;
+    } else {
+        alert(`${feature.charAt(0).toUpperCase() + feature.slice(1)} feature coming soon!`);
+    }
+}
+
+        // Handle navigation clicks
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                e.target.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

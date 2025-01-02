@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FaceTag - Loyalty & Rewards</title>
+    <style>
+        /* [Previous CSS styles remain the same] */
+ :root {
+            --dark-bg: #1e2127;
+            --light-blue: #45b3e7;
+            --white: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --success-green: #4CAF50;
+            --gold: #FFD700;
+            --silver: #C0C0C0;
+            --bronze: #CD7F32;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            min-height: 100vh;
+            color: var(--white);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .title {
+            font-size: 2rem;
+            color: var(--light-blue);
+        }
+
+        .add-card-btn {
+            padding: 0.8rem 1.5rem;
+            background: transparent;
+            border: 2px solid var(--light-blue);
+            color: var(--light-blue);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .add-card-btn:hover {
+            background: var(--light-blue);
+            color: var(--dark-bg);
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .loyalty-card {
+            background: var(--card-bg);
+            border: 1px solid var(--light-blue);
+            border-radius: 15px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+
+        .loyalty-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .business-name {
+            font-size: 1.5rem;
+            color: var(--light-blue);
+        }
+
+        .tier-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .tier-bronze {
+            background: rgba(205, 127, 50, 0.2);
+            color: var(--bronze);
+        }
+
+        .tier-silver {
+            background: rgba(192, 192, 192, 0.2);
+            color: var(--silver);
+        }
+
+        .tier-gold {
+            background: rgba(255, 215, 0, 0.2);
+            color: var(--gold);
+        }
+
+        .points-container {
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+
+        .points {
+            font-size: 2.5rem;
+            color: var(--light-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .points-label {
+            color: var(--white);
+            opacity: 0.8;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(69, 179, 231, 0.2);
+        }
+
+        .card-number {
+            color: var(--white);
+            opacity: 0.6;
+            font-size: 0.9rem;
+        }
+
+        .registration-date {
+            color: var(--white);
+            opacity: 0.6;
+            font-size: 0.9rem;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--dark-bg);
+            padding: 2rem;
+            border-radius: 15px;
+            border: 2px solid var(--light-blue);
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            color: var(--light-blue);
+            font-size: 1.5rem;
+        }
+
+        .close-modal {
+            background: transparent;
+            border: none;
+            color: var(--white);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--white);
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            background: transparent;
+            border: 2px solid var(--light-blue);
+            border-radius: 5px;
+            color: var(--white);
+            font-size: 1rem;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--white);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn {
+            background: var(--light-blue);
+            color: var(--dark-bg);
+            border: none;
+        }
+
+        .cancel-btn {
+            background: transparent;
+            border: 2px solid #ff4444;
+            color: #ff4444;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: var(--card-bg);
+            border-radius: 15px;
+            border: 2px dashed var(--light-blue);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: var(--light-blue);
+        }
+
+        .empty-text {
+            color: var(--white);
+            opacity: 0.8;
+            margin-bottom: 2rem;
+        }
+
+        /* Back Button */
+        .back-btn {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: 2px solid var(--light-blue);
+            color: var(--light-blue);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .back-btn:hover {
+            background: var(--light-blue);
+            color: var(--dark-bg);
+        }
+
+        .rewards-dashboard {
+    margin-bottom: 2rem;
+    background: var(--card-bg);
+    border-radius: 15px;
+    padding: 2rem;
+    border: 1px solid var(--light-blue);
+}
+
+.rewards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.reward-card {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1.5rem;
+    border-radius: 10px;
+    border: 1px solid rgba(69, 179, 231, 0.2);
+}
+
+.point-balance {
+    font-size: 2.5rem;
+    color: var(--light-blue);
+    margin: 0.5rem 0;
+}
+
+.point-value {
+    color: var(--success-green);
+    font-size: 0.9rem;
+}
+
+.points-expiring {
+    color: #ff4444;
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+}
+
+.tier-progress {
+    margin-top: 1rem;
+}
+
+.progress-bar {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress {
+    height: 100%;
+    background: var(--light-blue);
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+    opacity: 0.8;
+}
+
+.rewards-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.reward-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 5px;
+}
+
+.reward-item button {
+    padding: 0.3rem 0.8rem;
+    background: var(--light-blue);
+    border: none;
+    border-radius: 3px;
+    color: var(--dark-bg);
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+
+.reward-item button:hover {
+    opacity: 0.9;
+}
+    </style>
+</head>
+<body>
+
+    <div class="rewards-dashboard">
+        <div class="rewards-grid">
+            <!-- Points Summary Card -->
+            <div class="reward-card">
+                <h3>Total Points</h3>
+                <div class="point-balance">2,500</div>
+                <div class="point-value">Worth: R25.00</div>
+                <div class="points-expiring">200 points expiring in 30 days</div>
+            </div>
+    
+            <!-- Current Tier Card -->
+            <div class="reward-card">
+                <h3>Current Tier</h3>
+                <div class="tier-name">Silver</div>
+                <div class="tier-progress">
+                    <div class="progress-bar">
+                        <div class="progress" style="width: 65%"></div>
+                    </div>
+                    <div class="progress-text">3,500 points to Gold</div>
+                </div>
+            </div>
+    
+            <!-- Available Rewards -->
+            <div class="reward-card">
+                <h3>Available Rewards</h3>
+                <div class="rewards-list">
+                    <div class="reward-item">
+                        <span>🎂 Birthday Reward Available!</span>
+                        <button>Claim</button>
+                    </div>
+                    <div class="reward-item">
+                        <span>🎯 Visit milestone reward (4/5)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <a href="#" class="back-btn" onclick="goBack()">← Back to Dashboard</a>
+        
+        <div class="header">
+            <h1 class="title">Loyalty & Rewards</h1>
+            <button class="add-card-btn" onclick="openAddCardModal()">+ Add New Card</button>
+        </div>
+
+        <div id="cardsContainer">
+            <!-- Loading state -->
+            <div id="loadingState" style="display: none; text-align: center; padding: 2rem;">
+                <p style="color: var(--light-blue);">Loading your loyalty cards...</p>
+            </div>
+
+            <!-- Empty state -->
+            <div class="empty-state" id="emptyState">
+                <div class="empty-icon">🎯</div>
+                <p class="empty-text">You haven't added any loyalty cards yet. Add your first card to start earning rewards!</p>
+                <button class="add-card-btn" onclick="openAddCardModal()">Add Loyalty Card</button>
+            </div>
+
+            <!-- Error state -->
+            <div id="errorState" style="display: none; text-align: center; padding: 2rem;">
+                <p style="color: #ff4444;">Error loading loyalty cards. Please try again later.</p>
+                <button class="add-card-btn" onclick="loadLoyaltyCards()">Retry</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Card Modal -->
+    <div class="modal" id="addCardModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Add New Loyalty Card</h2>
+                <button class="close-modal" onclick="closeAddCardModal()">&times;</button>
+            </div>
+            <form id="addCardForm" onsubmit="handleAddCard(event)">
+                <div class="form-group">
+                    <label for="businessName">Select Business</label>
+                    <select id="businessName" required>
+                        <option value="">Choose a business partner</option>
+                        <option value="GameZone">GameZone - Gaming Store</option>
+                        <option value="FreshMart">FreshMart - Grocery Chain</option>
+                        <option value="TechHub">TechHub - Electronics</option>
+                        <option value="StyleFusion">StyleFusion - Fashion</option>
+                        <option value="FitLife">FitLife - Fitness Centers</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="cardNumber">Existing Card Number</label>
+                    <input type="text" id="cardNumber" required placeholder="Enter your existing card number">
+                    <div id="formatHelper" class="format-helper"></div>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="modal-btn cancel-btn" onclick="closeAddCardModal()">Cancel</button>
+                    <button type="submit" class="modal-btn submit-btn">Add Card</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('user_id');
+
+        console.log('URL Parameters:', Object.fromEntries(urlParams.entries()));
+console.log('User ID:', userId);
+
+        // Check for user ID on page load
+        window.onload = function() {
+            if (!userId) {
+                showError('No user ID found. Please log in again.');
+                return;
+            }
+            loadLoyaltyCards();
+        };
+
+        // Handle back navigation
+        function goBack() {
+            const params = {
+                user_id: userId,
+                name: urlParams.get('name') || '',
+                email: urlParams.get('email') || '',
+                age: urlParams.get('age') || '',
+                phone: urlParams.get('phone') || '',
+                image_path: urlParams.get('image_path') || ''
+            };
+            
+            const queryString = Object.keys(params)
+                .filter(key => params[key])
+                .map(key => `${key}=${encodeURIComponent(params[key])}`)
+                .join('&');
+                
+            window.location.href = `dashboard.html?${queryString}`;
+        }
+
+        // Show/hide states
+        function showLoading() {
+            document.getElementById('loadingState').style.display = 'block';
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('errorState').style.display = 'none';
+        }
+
+        function showEmpty() {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'block';
+            document.getElementById('errorState').style.display = 'none';
+        }
+
+        function showError(message) {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('errorState').style.display = 'block';
+            document.getElementById('errorState').querySelector('p').textContent = message;
+        }
+
+        // Load loyalty cards
+        async function loadLoyaltyCards() {
+            
+            console.log('Loading cards for user ID:', userId);
+    if (!userId) {
+        showError('No user ID provided. Please log in again.');
+        return;
+    }
+
+            showLoading();
+
+            try {
+                const response = await fetch(`http://127.0.0.1:5000/api/loyalty/cards?user_id=${userId}`, {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.success && data.cards.length > 0) {
+                    document.getElementById('loadingState').style.display = 'none';
+                    document.getElementById('emptyState').style.display = 'none';
+                    
+                    const cardsGrid = document.createElement('div');
+                    cardsGrid.className = 'cards-grid';
+                    
+                    data.cards.forEach(card => {
+                        cardsGrid.appendChild(createCardElement(card));
+                    });
+                    
+                    const container = document.getElementById('cardsContainer');
+                    const existingGrid = container.querySelector('.cards-grid');
+                    if (existingGrid) {
+                        container.removeChild(existingGrid);
+                    }
+                    container.appendChild(cardsGrid);
+                } else {
+                    showEmpty();
+                }
+            } catch (error) {
+                console.error('Error loading loyalty cards:', error);
+                showError('Error loading loyalty cards. Please try again later.');
+            }
+        }
+
+        // Create card element
+        function createCardElement(card) {
+            const cardElement = document.createElement('div');
+            cardElement.className = 'loyalty-card';
+            
+            const tierClass = `tier-${card.tier_status.toLowerCase()}`;
+            const registrationDate = new Date(card.registration_date).toLocaleDateString();
+            
+            cardElement.innerHTML = `
+                <div class="card-header">
+                    <h3 class="business-name">${card.business_name}</h3>
+                    <span class="tier-badge ${tierClass}">${card.tier_status}</span>
+                </div>
+                <div class="points-container">
+                    <div class="points">${card.points}</div>
+                    <div class="points-label">Points Earned</div>
+                </div>
+                <div class="card-footer">
+                    <div class="card-number">${card.card_number}</div>
+                    <div class="registration-date">Joined ${registrationDate}</div>
+                </div>
+            `;
+            
+            return cardElement;
+        }
+
+        // Modal functions
+        function openAddCardModal() {
+            document.getElementById('addCardModal').style.display = 'flex';
+        }
+
+        function closeAddCardModal() {
+            document.getElementById('addCardModal').style.display = 'none';
+            document.getElementById('addCardForm').reset();
+            document.getElementById('formatHelper').textContent = '';
+        }
+
+        // Card number format helper
+        const validationRules = {
+            'GameZone': {
+                pattern: /^GZ-\d{6}$/,
+                example: 'GZ-123456',
+                description: 'Format: GZ-######'
+            },
+            'FreshMart': {
+                pattern: /^FM\d{8}$/,
+                example: 'FM12345678',
+                description: 'Format: FM########'
+            },
+            'TechHub': {
+                pattern: /^TH-\d{4}-[A-Z]{2}$/,
+                example: 'TH-1234-AB',
+                description: 'Format: TH-####-XX'
+            },
+            'StyleFusion': {
+                pattern: /^SF-[A-Z]{2}\d{5}$/,
+                example: 'SF-AB12345',
+                description: 'Format: SF-XX#####'
+            },
+            'FitLife': {
+                pattern: /^FL\d{4}[A-Z]{3}$/,
+                example: 'FL1234ABC',
+                description: 'Format: FL####XXX'
+            }
+        };
+
+        // Business select event listener
+        document.getElementById('businessName').addEventListener('change', function() {
+            const business = this.value;
+            const formatHelper = document.getElementById('formatHelper');
+            
+            if (business && validationRules[business]) {
+                const rule = validationRules[business];
+                formatHelper.textContent = `${rule.description} (${rule.example})`;
+            } else {
+                formatHelper.textContent = '';
+            }
+        });
+
+        // Handle add card submission
+        async function handleAddCard(event) {
+            event.preventDefault();
+            
+            if (!userId) {
+                alert('Error: User ID is missing. Please log in again.');
+                return;
+            }
+            
+            const businessName = document.getElementById('businessName').value;
+            const cardNumber = document.getElementById('cardNumber').value;
+            
+            if (!businessName || !cardNumber) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            const selectedBusiness = validationRules[businessName];
+            if (!selectedBusiness.pattern.test(cardNumber)) {
+                alert(`Invalid card number format for ${businessName}.\n${selectedBusiness.description}\nExample: ${selectedBusiness.example}`);
+                return;
+            }
+
+            try {
+                const submitButton = event.target.querySelector('[type="submit"]');
+                submitButton.disabled = true;
+                submitButton.textContent = 'Adding...';
+
+                const response = await fetch('http://127.0.0.1:5000/api/loyalty/add', {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        business_name: businessName,
+                        card_number: cardNumber
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    closeAddCardModal();
+                    await loadLoyaltyCards();
+                    alert('Loyalty card added successfully!');
+                } else {
+                    throw new Error(data.error || 'Error adding loyalty card');
+                }
+            } catch (error) {
+                console.error('Error adding loyalty card:', error);
+                alert(`Error adding loyalty card: ${error.message}`);
+            } finally {
+                const submitButton = event.target.querySelector('[type="submit"]');
+                submitButton.disabled = false;
+                submitButton.textContent = 'Add Card';
+            }
+        }
+
+        // Close modal on outside click
+        window.onclick = function(event) {
+            const modal = document.getElementById('addCardModal');
+            if (event.target === modal) {
+                closeAddCardModal();
+            }
+        }
+
+        // Add to your existing JavaScript
+async function loadRewardsData() {
+    try {
+        const response = await fetch(`http://127.0.0.1:5000/api/loyalty/rewards?user_id=${userId}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            updateRewardsDashboard(data);
+        }
+    } catch (error) {
+        console.error('Error loading rewards data:', error);
+    }
+}
+
+function updateRewardsDashboard(data) {
+    // Update points
+    document.querySelector('.point-balance').textContent = 
+        data.totalPoints.toLocaleString();
+    
+    // Update point value
+    const pointValue = (data.totalPoints / 100).toFixed(2);
+    document.querySelector('.point-value').textContent = 
+        `Worth: R${pointValue}`;
+    
+    // Update tier progress
+    const progressBar = document.querySelector('.progress');
+    progressBar.style.width = `${data.tierProgress}%`;
+    
+    // Update available rewards
+    updateAvailableRewards(data.availableRewards);
+}
+
+function updateAvailableRewards(rewards) {
+    const rewardsList = document.querySelector('.rewards-list');
+    rewardsList.innerHTML = rewards.map(reward => `
+        <div class="reward-item">
+            <span>${reward.icon} ${reward.description}</span>
+            ${reward.claimable ? '<button onclick="claimReward(' + reward.id + ')">Claim</button>' : ''}
+        </div>
+    `).join('');
+}
+
+async function claimReward(rewardId) {
+    try {
+        const response = await fetch('http://127.0.0.1:5000/api/loyalty/claim-reward', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                user_id: userId,
+                reward_id: rewardId
+            })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+            alert('Reward claimed successfully!');
+            loadRewardsData(); // Refresh the dashboard
+        }
+    } catch (error) {
+        console.error('Error claiming reward:', error);
+        alert('Failed to claim reward. Please try again.');
+    }
+}
+
+// Add to window.onload
+window.onload = function() {
+    loadLoyaltyCards();
+    loadRewardsData();
+};
+    </script>
+</body>
+</html>

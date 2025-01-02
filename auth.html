@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facetag - Choose Authentication</title>
+    <style>
+        :root {
+            --dark-bg: #1e2127;
+            --light-blue: #45b3e7;
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .auth-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .auth-btn {
+            padding: 1.5rem 4rem;
+            font-size: 1.5rem;
+            border: 3px solid var(--light-blue);
+            background: transparent;
+            color: var(--light-blue);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+
+        .auth-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            width: 300px;
+            height: 300px;
+            background: var(--light-blue);
+            border-radius: 50%;
+            transition: transform 0.5s ease;
+            z-index: -1;
+        }
+
+        .auth-btn:hover {
+            color: var(--dark-bg);
+        }
+
+        .auth-btn:hover::before {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .title {
+            color: var(--white);
+            font-size: 3rem;
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: fadeIn 1s forwards;
+        }
+
+        .subtitle {
+            color: var(--light-blue);
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+            opacity: 0;
+            animation: fadeIn 1s forwards 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Digital corner decorations */
+        .corner {
+            position: fixed;
+            width: 150px;
+            height: 150px;
+            pointer-events: none;
+        }
+
+        .corner-tl {
+            top: 0;
+            left: 0;
+            border-top: 3px solid var(--light-blue);
+            border-left: 3px solid var(--light-blue);
+            border-top-left-radius: 20px;
+        }
+
+        .corner-br {
+            bottom: 0;
+            right: 0;
+            border-bottom: 3px solid var(--light-blue);
+            border-right: 3px solid var(--light-blue);
+            border-bottom-right-radius: 20px;
+        }
+
+        /* Digital lines animation */
+        .digital-line {
+            position: absolute;
+            background: var(--light-blue);
+        }
+
+        .line-1, .line-2 {
+            height: 2px;
+            width: 50px;
+            animation: linePulse 2s infinite;
+        }
+
+        .line-3, .line-4 {
+            width: 2px;
+            height: 50px;
+            animation: linePulse 2s infinite;
+        }
+
+        .line-1 { top: 30px; left: 30px; }
+        .line-2 { bottom: 30px; right: 30px; }
+        .line-3 { top: 30px; left: 30px; }
+        .line-4 { bottom: 30px; right: 30px; }
+
+        @keyframes linePulse {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+
+        .camera-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(30, 33, 39, 0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            flex-direction: column;
+        }
+
+        .camera-frame {
+            position: relative;
+            width: 640px;
+            height: 480px;
+            max-width: 90vw;
+            max-height: 70vh;
+            border: 3px solid var(--light-blue);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .camera-frame::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            border: 2px solid var(--light-blue);
+            border-radius: 10px;
+            pointer-events: none;
+        }
+
+        .camera-status {
+            color: var(--white);
+            margin-top: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .close-camera {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: transparent;
+            border: none;
+            color: var(--white);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 50%;
+            border: 2px solid var(--light-blue);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .close-camera:hover {
+            background: var(--light-blue);
+            color: var(--dark-bg);
+        }
+
+        .scanning-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--light-blue);
+            animation: scan 2s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+
+        /* Add this to your existing CSS */
+.signup-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(30, 33, 39, 0.95);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.signup-form {
+    background: var(--dark-bg);
+    padding: 2rem;
+    border-radius: 10px;
+    border: 2px solid var(--light-blue);
+    width: 100%;
+    max-width: 400px;
+}
+
+.signup-form h2 {
+    color: var(--white);
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 1.8rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.8rem;
+    background: transparent;
+    border: 2px solid var(--light-blue);
+    border-radius: 5px;
+    color: var(--white);
+    font-size: 1rem;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--white);
+}
+
+.form-group input::placeholder {
+    color: rgba(69, 179, 231, 0.6);
+}
+
+.form-btn {
+    width: 100%;
+    padding: 1rem;
+    margin-top: 1rem;
+    background: transparent;
+    border: 2px solid var(--light-blue);
+    color: var(--light-blue);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+.form-btn:hover {
+    background: var(--light-blue);
+    color: var(--dark-bg);
+}
+
+.form-btn.cancel {
+    background: transparent;
+    border-color: #ff4444;
+    color: #ff4444;
+}
+
+.form-btn.cancel:hover {
+    background: #ff4444;
+    color: var(--dark-bg);
+}
+
+.camera-controls {
+    margin-top: 1rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.capture-btn, .retake-btn, .submit-btn {
+    padding: 0.8rem 1.5rem;
+    border: 2px solid var(--light-blue);
+    background: transparent;
+    color: var(--light-blue);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.capture-btn:hover, .retake-btn:hover, .submit-btn:hover {
+    background: var(--light-blue);
+    color: var(--dark-bg);
+}
+    </style>
+</head>
+<body>
+    <!-- Corner decorations -->
+    <div class="corner corner-tl">
+        <div class="digital-line line-1"></div>
+        <div class="digital-line line-3"></div>
+    </div>
+    <div class="corner corner-br">
+        <div class="digital-line line-2"></div>
+        <div class="digital-line line-4"></div>
+    </div>
+
+    <div class="container">
+        <h1 class="title">Welcome to Facetag</h1>
+        <p class="subtitle">Choose your authentication method</p>
+        <div class="auth-buttons">
+            <button class="auth-btn" onclick="handleAuth('login')">Login</button>
+            <button class="auth-btn" onclick="handleAuth('signup')">Sign Up</button>
+        </div>
+    </div>
+
+    <!-- Camera Container -->
+    <div class="camera-container" id="cameraContainer">
+        <div class="camera-frame">
+            <video id="video" autoplay></video>
+            <div class="scanning-line"></div>
+        </div>
+        <div class="camera-status" id="cameraStatus">Initializing camera...</div>
+        <button class="close-camera" onclick="closeCamera()">×</button>
+    </div>
+
+    <!-- Add this right after the camera-container div -->
+<div class="signup-container" id="signupContainer">
+    <div class="signup-form">
+        <h2>Create Account</h2>
+        <form id="userForm" onsubmit="return false;">
+            <div class="form-group">
+                <input type="text" id="name" required placeholder="Full Name">
+            </div>
+            <div class="form-group">
+                <input type="number" id="age" required placeholder="Age">
+            </div>
+            <div class="form-group">
+                <input type="email" id="email" placeholder="Email (Optional)">
+            </div>
+            <div class="form-group">
+                <input type="tel" id="phone" placeholder="Phone (Optional)">
+            </div>
+            <button class="form-btn" onclick="startSignupCamera()">Next</button>
+            <button class="form-btn cancel" onclick="closeSignupForm()">Cancel</button>
+        </form>
+    </div>
+</div>
+
+<!-- Add this camera container specifically for signup -->
+<div class="camera-container" id="signupCameraContainer">
+    <div class="camera-frame">
+        <video id="signupVideo" autoplay></video>
+        <div class="scanning-line"></div>
+    </div>
+    <div class="camera-controls">
+        <button class="capture-btn" onclick="captureSignupPhoto()">Take Photo</button>
+        <button class="retake-btn" style="display: none;" onclick="retakePhoto()">Retake</button>
+        <button class="submit-btn" style="display: none;" onclick="submitSignup()">Submit</button>
+    </div>
+    <div class="camera-status" id="signupCameraStatus">Position your face in the frame</div>
+    <button class="close-camera" onclick="closeSignupCamera()">×</button>
+</div>
+
+    <script>
+        let stream = null;
+
+        async function handleAuth(type) {
+            const button = event.target;
+            button.style.transform = 'scale(0.95)';
+            
+            setTimeout(() => {
+                button.style.transform = 'scale(1)';
+                if (type === 'login') {
+                    startCamera();
+                } else {
+                    document.getElementById('signupContainer').style.display = 'flex';
+                }
+            }, 200);
+        }
+
+        async function startCamera() {
+            const cameraContainer = document.getElementById('cameraContainer');
+            const video = document.getElementById('video');
+            const status = document.getElementById('cameraStatus');
+
+            cameraContainer.style.display = 'flex';
+
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: {
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    }
+                });
+                video.srcObject = stream;
+                status.textContent = 'Looking for face...';
+
+                // Start face detection process
+                setTimeout(checkFace, 1000);
+            } catch (err) {
+                status.textContent = 'Error accessing camera: ' + err.message;
+            }
+        }
+
+        function captureFrame() {
+            const video = document.getElementById('video');
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            return canvas.toDataURL('image/jpeg');
+        }
+
+        function checkFace() {
+            const status = document.getElementById('cameraStatus');
+            
+            setTimeout(() => {
+                status.textContent = 'Face detected! Checking database...';
+                
+                const imageData = captureFrame();
+                fetch('http://localhost:5000/api/identify', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        image: imageData
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+    status.textContent = `Welcome back, ${data.user.name}!`;
+    setTimeout(() => {
+        closeCamera();
+        // Make sure to include user_id in the redirect
+        window.location.href = `dashboard.html?user_id=${data.user.id}&name=${encodeURIComponent(data.user.name)}&email=${encodeURIComponent(data.user.email || '')}&age=${data.user.age}&phone=${encodeURIComponent(data.user.phone || '')}&image_path=${encodeURIComponent(data.user.image_path || '')}`;
+    }, 1500);
+} else {
+                        status.textContent = 'Face not recognized. Please try again.';
+                    }
+                })
+                .catch(error => {
+                    status.textContent = 'Error during identification. Please try again.';
+                });
+            }, 1500);
+        }
+
+        function closeCamera() {
+            const cameraContainer = document.getElementById('cameraContainer');
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            cameraContainer.style.display = 'none';
+        }
+
+        // Add hover effect for digital lines
+        document.querySelectorAll('.auth-btn').forEach(btn => {
+            btn.addEventListener('mouseover', () => {
+                document.querySelectorAll('.digital-line').forEach(line => {
+                    line.style.backgroundColor = 'var(--white)';
+                });
+            });
+
+            btn.addEventListener('mouseout', () => {
+                document.querySelectorAll('.digital-line').forEach(line => {
+                    line.style.backgroundColor = 'var(--light-blue)';
+                });
+            });
+        });
+
+
+let signupStream = null;
+let capturedImage = null;
+
+function closeSignupForm() {
+    document.getElementById('signupContainer').style.display = 'none';
+}
+
+async function startSignupCamera() {
+    // Basic form validation
+    const name = document.getElementById('name').value;
+    const age = document.getElementById('age').value;
+    
+    if (!name || !age) {
+        alert('Please fill in required fields (Name and Age)');
+        return;
+    }
+    
+    // Hide signup form and show camera
+    document.getElementById('signupContainer').style.display = 'none';
+    const cameraContainer = document.getElementById('signupCameraContainer');
+    const video = document.getElementById('signupVideo');
+    const status = document.getElementById('signupCameraStatus');
+
+    cameraContainer.style.display = 'flex';
+    document.querySelector('.capture-btn').style.display = 'block';
+    document.querySelector('.retake-btn').style.display = 'none';
+    document.querySelector('.submit-btn').style.display = 'none';
+
+    try {
+        signupStream = await navigator.mediaDevices.getUserMedia({ 
+            video: {
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
+            }
+        });
+        video.srcObject = signupStream;
+        status.textContent = 'Position your face in the frame';
+    } catch (err) {
+        status.textContent = 'Error accessing camera: ' + err.message;
+    }
+}
+
+function captureSignupPhoto() {
+    const video = document.getElementById('signupVideo');
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    
+    capturedImage = canvas.toDataURL('image/jpeg');
+    
+    // Stop video stream and show still image
+    video.srcObject = null;
+    video.poster = capturedImage;
+    
+    // Update UI
+    document.querySelector('.capture-btn').style.display = 'none';
+    document.querySelector('.retake-btn').style.display = 'block';
+    document.querySelector('.submit-btn').style.display = 'block';
+    document.getElementById('signupCameraStatus').textContent = 'Photo captured! Submit or retake?';
+}
+
+function retakePhoto() {
+    const video = document.getElementById('signupVideo');
+    video.srcObject = signupStream;
+    capturedImage = null;
+    
+    // Update UI
+    document.querySelector('.capture-btn').style.display = 'block';
+    document.querySelector('.retake-btn').style.display = 'none';
+    document.querySelector('.submit-btn').style.display = 'none';
+    document.getElementById('signupCameraStatus').textContent = 'Position your face in the frame';
+}
+
+function submitSignup() {
+    const status = document.getElementById('signupCameraStatus');
+    status.textContent = 'Registering user...';
+    
+    // Get form data
+    const formData = {
+        name: document.getElementById('name').value,
+        age: parseInt(document.getElementById('age').value),
+        email: document.getElementById('email').value || null,
+        phone: document.getElementById('phone').value || null,
+        image: capturedImage
+    };
+
+    console.log('Sending registration request with data:', {
+        ...formData,
+        image: formData.image.substring(0, 50) + '...' // Log just the start of the image data
+    });
+
+    // Send to backend
+    fetch('http://localhost:5000/api/register', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+        return response.json();
+    })
+    .then(data => {
+        console.log('Response data:', data);
+        // In auth.html, update the submitSignup success handler:
+// Update this part in auth.html
+if (data.success) {
+    status.textContent = 'Registration successful!';
+    setTimeout(() => {
+        closeSignupCamera();
+        // Redirect to dashboard with user info (all in one line)
+        window.location.href = `dashboard.html?name=${encodeURIComponent(formData.name)}&email=${encodeURIComponent(formData.email || '')}&age=${formData.age}&phone=${encodeURIComponent(formData.phone || '')}&image_path=${encodeURIComponent(data.image_path || '')}`;
+    }, 1500);
+}
+    })
+    .catch(error => {
+        console.error('Detailed error:', error);
+        status.textContent = 'Error during registration. Please try again.';
+    });
+}
+
+
+
+function closeSignupCamera() {
+    const cameraContainer = document.getElementById('signupCameraContainer');
+    if (signupStream) {
+        signupStream.getTracks().forEach(track => track.stop());
+    }
+    cameraContainer.style.display = 'none';
+    capturedImage = null;
+}
+
+    </script>
+</body>
+</html>
